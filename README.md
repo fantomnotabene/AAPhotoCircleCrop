@@ -8,7 +8,7 @@
 
 AAPhotoCircleCrop is a simple circular photo cropper writter in Swift, based on Whatsapp.
 
-![](https://github.com/andreaantonioni/AAPhotoCircleCrop/blob/master/Resources/screenshot1.png "Screenshot 1")
+![](https://habrastorage.org/files/b84/ae2/b25/b84ae2b258b3445bab752e97e4a6c3d6.png "Screenshot 1")
 
 ## Requirements
 * iOS 8.0+
@@ -69,10 +69,11 @@ circleCropController.imageSize = CGSize(width: 200, height: 200)
 ```
 
 ### Localization
-AAPhotoCircleCrop support localized strings. To get button titles localized, just sets a value to ```selectTitle``` and ```cancelTitle```
+AAPhotoCircleCrop support localized strings. To get button titles localized, just sets a value to ```selectTitle```, ```rotateTitle``` and ```cancelTitle```
 ```swift
-// 🌎 use selectTitle and cancelTitle to localize buttons
+// 🌎 use selectTitle, rotateTitle and cancelTitle to localize buttons
 circleCropController.selectTitle = NSLocalizedString("select-button", comment: "Select")
+circleCropController.rotateTitle = NSLocalizedString("rotate-button", comment: "Rotate")
 circleCropController.cancelTitle = NSLocalizedString("cancel-button", comment: "Cancel")
 ```
 
