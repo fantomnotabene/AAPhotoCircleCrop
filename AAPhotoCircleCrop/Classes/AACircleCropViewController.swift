@@ -26,6 +26,7 @@ open class AACircleCropViewController: UIViewController, UIScrollViewDelegate {
     open var imageSize: CGSize?
     /// Titles of the buttons. You can use them for localization
     open var selectTitle: String = "Select"
+    open var rotateTitle: String = "Rotate"
     open var cancelTitle: String = "Cancel"
     /// Status bar style
     override open var preferredStatusBarStyle: UIStatusBarStyle {
@@ -34,6 +35,7 @@ open class AACircleCropViewController: UIViewController, UIScrollViewDelegate {
     
     // MARK: - Private properties
     fileprivate var selectButton: UIButton!
+    fileprivate var rotateButton: UIButton!
     fileprivate var cancelButton: UIButton!
     fileprivate var imageView: UIImageView!
     fileprivate var scrollView: AACircleCropScrollView!
@@ -55,11 +57,11 @@ open class AACircleCropViewController: UIViewController, UIScrollViewDelegate {
         // Setup imageView
         imageView = UIImageView()
         imageView.image = image
-        imageView.frame = CGRect(origin: CGPoint.zero, size: image.size)
+        imageView.frame = CGRect(origin: .zero, size: image.size)
         
         // Setup scrollView
         scrollView = AACircleCropScrollView(frame: CGRect(x: 0, y: 0, width: circleDiameter, height: circleDiameter))
-        scrollView.backgroundColor = UIColor.black
+        scrollView.backgroundColor = .black
         scrollView.delegate = self
         scrollView.addSubview(imageView)
         scrollView.contentSize = image.size
@@ -112,27 +114,39 @@ open class AACircleCropViewController: UIViewController, UIScrollViewDelegate {
     fileprivate func setupButtons() {
         
         selectButton = UIButton()
+        rotateButton = UIButton()
         cancelButton = UIButton()
         
         // Styles
         selectButton.setTitle(selectTitle, for: .normal)
-        selectButton.setTitleColor(UIColor.white, for: .normal)
+        selectButton.setTitleColor(.white, for: .normal)
         selectButton.titleLabel?.font = cancelButton.titleLabel?.font.withSize(17)
         selectButton.addTarget(self, action: #selector(selectAction), for: .touchUpInside)
         
+        rotateButton.setTitle(rotateTitle, for: .normal)
+        rotateButton.setTitleColor(.white, for: .normal)
+        rotateButton.titleLabel?.font = cancelButton.titleLabel?.font.withSize(17)
+        rotateButton.addTarget(self, action: #selector(rotateAction), for: .touchUpInside)
+        
         cancelButton.setTitle(cancelTitle, for: .normal)
-        cancelButton.setTitleColor(UIColor.white, for: .normal)
+        cancelButton.setTitleColor(.white, for: .normal)
         cancelButton.titleLabel?.font = cancelButton.titleLabel?.font.withSize(17)
         cancelButton.addTarget(self, action: #selector(cancelAction), for: .touchUpInside)
         
         // Adding buttons to the superview
         cutterView.addSubview(selectButton)
+        cutterView.addSubview(rotateButton)
         cutterView.addSubview(cancelButton)
         
         // cancelButton constraints
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         cutterView.addConstraint(NSLayoutConstraint(item: cancelButton, attribute: .leading, relatedBy: .equal, toItem: cutterView, attribute: .leadingMargin, multiplier: 1, constant: 20))
         cutterView.addConstraint(NSLayoutConstraint(item: cancelButton, attribute: .bottomMargin, relatedBy: .equal, toItem: cutterView, attribute: .bottomMargin, multiplier: 1, constant: -32))
+        
+        // rotateButton consrtraints
+        rotateButton.translatesAutoresizingMaskIntoConstraints = false
+		cutterView.addConstraint(NSLayoutConstraint(item: rotateButton, attribute: .centerY, relatedBy: .equal, toItem: cancelButton, attribute: .centerY, multiplier: 1, constant: 0))
+		cutterView.addConstraint(NSLayoutConstraint(item: rotateButton, attribute: .centerX, relatedBy: .equal, toItem: cutterView, attribute: .centerX, multiplier: 1, constant: 0))
         
         // selectButton consrtraints
         selectButton.translatesAutoresizingMaskIntoConstraints = false
@@ -150,7 +164,8 @@ open class AACircleCropViewController: UIViewController, UIScrollViewDelegate {
     
     func selectAction() {
         
-        let newSize = CGSize(width: image.size.width * scrollView.zoomScale, height: image.size.height * scrollView.zoomScale)
+        let newSize = CGSize(width: imageView.image!.size.width * scrollView.zoomScale, 
+                             height: imageView.image!.size.height * scrollView.zoomScale)
         
         let offset = scrollView.contentOffset
         
@@ -160,7 +175,7 @@ open class AACircleCropViewController: UIViewController, UIScrollViewDelegate {
         var sharpRect = CGRect(x: -offset.x, y: -offset.y, width: newSize.width, height: newSize.height)
         sharpRect = sharpRect.integral
         
-        image.draw(in: sharpRect)
+        imageView.image!.draw(in: sharpRect)
         let finalImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         if let imageData = UIImagePNGRepresentation(finalImage!), var pngImage = UIImage(data: imageData) {
@@ -174,6 +189,12 @@ open class AACircleCropViewController: UIViewController, UIScrollViewDelegate {
             delegate?.circleCropDidCancel?()
         }
         self.dismiss(animated: true, completion: nil) 
+    }
+    
+    func rotateAction() {
+        imageView.image = imageView.image!.rotatedBy(degrees: 90)
+		imageView.frame = CGRect(x: 0, y: 0, width: imageView.frame.size.height, height: imageView.frame.size.width)
+		scrollView.contentSize = imageView.frame.size
     }
     
     func cancelAction() {
